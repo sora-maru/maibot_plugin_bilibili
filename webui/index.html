@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bilibili 订阅管理</title>
+<style>
+:root{color-scheme:light dark;font-family:system-ui,"Microsoft YaHei",sans-serif;font-size:14px}*{box-sizing:border-box}body{margin:0;padding:24px;background:Canvas;color:CanvasText}main{max-width:1100px;margin:auto}h1{font-size:24px;margin:0 0 8px}h2{font-size:18px}p{line-height:1.7}.muted{opacity:.7}.panel{border:1px solid color-mix(in srgb,CanvasText 18%,transparent);border-radius:14px;padding:20px;margin:18px 0}label{display:block;margin:12px 0 6px}input,select,button{font:inherit;border:1px solid color-mix(in srgb,CanvasText 25%,transparent);border-radius:8px;padding:9px;background:Canvas;color:CanvasText}input,select{width:100%}button{cursor:pointer;margin:4px 6px 4px 0}button:disabled{opacity:.5;cursor:wait}button.primary{background:#e75583;color:#fff;border-color:#e75583}.row{display:flex;gap:16px;align-items:flex-end}.row>div{flex:1}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:12px 8px;border-bottom:1px solid color-mix(in srgb,CanvasText 15%,transparent);vertical-align:top;overflow-wrap:anywhere}th{opacity:.65}td small{display:block;opacity:.65;margin-top:5px}.tablewrap{overflow:auto}.danger{color:#e5484d}#notice{padding:12px 0;white-space:pre-wrap;min-height:42px}#status{display:inline-block;padding:6px 12px;border-radius:20px;background:color-mix(in srgb,#e75583 13%,Canvas)}code{overflow-wrap:anywhere}@media(max-width:650px){body{padding:12px}.row{display:block}.panel{padding:14px}}
+@supports not (color:color-mix(in srgb,black,white)) {.panel{border:1px solid #8885}input,select,button{border:1px solid #8888}th,td{border-bottom:1px solid #8884}#status{background:#e7558320}}
+</style></head>
+<body><main>
+<div class="toolbar"><div><h1>Bilibili 订阅管理</h1><span class="muted">按聊天管理 UP 主动态与直播提醒</span></div><button id="refresh">刷新</button></div>
+<p id="status">正在连接插件……</p><div id="notice" role="status" aria-live="polite"></div>
+<section class="panel"><h2>添加或编辑订阅</h2>
+<form id="editor">
+<label for="stream">目标聊天</label><select id="stream" required></select>
+<div class="row"><div><label for="uid">B站 UID</label><input id="uid" inputmode="numeric" pattern="[0-9]+" required placeholder="UP 主的数字 UID"></div><div><button id="lookup" type="button">查询 UP 主</button><span id="upname"></span></div></div>
+<label for="options">过滤器与提醒选项</label><input id="options" maxlength="2000" placeholder="例如 lottery forward live_atall">
+<p class="muted">过滤类型：forward、lottery、video、article、draw、live、live_end、forward_lottery。其他词按正则过滤，含空格的表达式用引号包裹。at_all 开启动态及开播 @全体；live_atall 仅开播 @全体；下播不 @。</p>
+<label for="atusers">需要单独 @ 的 QQ 号</label><input id="atusers" maxlength="2000" placeholder="多个 QQ 号用空格或逗号分隔">
+<p class="muted">保存会覆盖该聊天、该 UP 主的过滤条件与提醒名单。移除 at_all 或 live_atall 后保存即可关闭对应选项。</p>
+<button class="primary" type="submit">保存订阅</button><button id="clear" type="button">清空表单</button>
+</form></section>
+<section class="panel"><div class="toolbar"><h2>当前订阅</h2><span id="count"></span></div><div class="tablewrap"><table><thead><tr><th>聊天 / UID</th><th>过滤与提醒</th><th>操作</th></tr></thead><tbody id="records"></tbody></table></div></section>
+<section class="panel"><h2>待确认投递</h2><p class="muted">未收到明确投递回执时，对应订阅会暂停推送。请先检查 QQ：已收到则选“已收到”，确认没收到再选“允许重试”。重试将在下一轮检测执行。</p><div id="pending"></div></section>
+<section class="panel"><h2>卡片样式与头像</h2><div class="row"><div><label for="style">样式</label><select id="style"><option value="template_1">经典风格</option><option value="template_2">B站粉风格</option><option value="simple">简约风格</option></select></div><div><button id="savestyle">切换样式</button></div></div>
+<label for="logo">自定义卡片头像</label><input id="logo" type="file" accept="image/png,image/jpeg,image/webp"><p id="logostate" class="muted"></p><button id="upload">上传头像</button><button id="resetlogo">恢复默认头像</button></section>
+<p class="muted">B站登录：先在插件配置 access.admin_users 填入管理员 QQ 号，再由管理员私聊机器人发送 /bili_login。配置中的 SESSDATA 也可使用。图片卡片需要 MaiBot 的浏览器渲染服务可用，渲染失败时会发送文字与原图。</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);let state=null;
+function tell(text,error=false){$('notice').textContent=text;$('notice').className=error?'danger':'';}
+async function run(fn){const buttons=[...document.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);try{await fn();}catch(e){tell(e.message||String(e),true);}finally{buttons.forEach(b=>b.disabled=false);}}
+function button(label,fn,danger=false){const b=document.createElement('button');b.type='button';b.textContent=label;if(danger)b.className='danger';b.onclick=()=>run(fn);return b;}
+async function action(name,args={}){const result=await maibot.action(name,args);tell(result.message||'操作已完成');await load();return result;}
+function clear(){ $('uid').value='';$('options').value='';$('atusers').value='';$('upname').textContent='';}
+async function load(){
+ state=await maibot.query('state');const old=$('stream').value;$('stream').replaceChildren();
+ for(const s of state.streams){const o=document.createElement('option');o.value=s.stream_id;o.textContent=s.name+' · '+s.stream_id;$('stream').append(o);}if([...$('stream').options].some(o=>o.value===old))$('stream').value=old;
+ $('status').textContent=(state.logged_in?'B站凭据已配置':'尚未配置B站凭据')+' · '+state.subscriptions.length+' 条订阅';$('count').textContent=state.subscriptions.length+' 条';$('style').value=state.style;$('logostate').textContent=state.logo_customized?'正在使用自定义头像':'正在使用默认头像';
+ $('records').replaceChildren();
+ for(const r of state.subscriptions){const tr=document.createElement('tr'),a=document.createElement('td'),b=document.createElement('td'),c=document.createElement('td');a.textContent=r.session_name+' / '+r.uid;const small=document.createElement('small');small.textContent=r.stream_id;a.append(small);b.textContent=(r.options||'不设置过滤')+'\n@订阅者：'+(r.at_users.join(', ')||'无')+(r.pending?' · 投递待确认':'');
+ c.append(button('编辑',async()=>{$('stream').value=r.stream_id;$('uid').value=r.uid;$('options').value=r.options;$('atusers').value=r.at_users.join(' ');$('editor').scrollIntoView({behavior:'smooth'});}),button('删除',()=>action('delete',{stream_id:r.stream_id,uid:r.uid}),true));tr.append(a,b,c);$('records').append(tr);}
+ if(!state.subscriptions.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=3;td.textContent='还没有订阅，选择聊天并填写 UID 后保存。';tr.append(td);$('records').append(tr);}
+ $('pending').replaceChildren();for(const p of state.pending){const div=document.createElement('div');const text=document.createElement('p');text.textContent='UID '+p.uid+' · '+p.category+' · '+p.stream_id+' · '+new Date(p.time*1000).toLocaleString();div.append(text,button('已收到',()=>action('ack',{stream_id:p.stream_id,uid:String(p.uid),resolution:'ack'})),button('允许重试',()=>action('retry',{stream_id:p.stream_id,uid:String(p.uid),resolution:'retry'}),true));$('pending').append(div);}if(!state.pending.length)$('pending').textContent='没有待确认投递。';
+}
+$('refresh').onclick=()=>run(load);$('clear').onclick=clear;
+$('editor').onsubmit=e=>{e.preventDefault();run(()=>action('save',{stream_id:$('stream').value,uid:$('uid').value,options:$('options').value,at_users:$('atusers').value}));};
+$('lookup').onclick=()=>run(async()=>{const r=await maibot.query('up',{uid:$('uid').value});$('upname').textContent=r.name+'（'+r.uid+'）';});
+$('savestyle').onclick=()=>run(()=>action('style',{style:$('style').value}));
+$('resetlogo').onclick=()=>run(()=>action('resetlogo'));
+$('upload').onclick=()=>run(async()=>{const file=$('logo').files[0];if(!file)throw new Error('请先选择 PNG、JPEG 或 WebP 图片');const result=await maibot.upload('logo',file);tell(result.message||'头像已上传');$('logo').value='';await load();});
+(async()=>{try{await maibot.ready;await run(load);}catch(e){tell(e.message||String(e),true);}})();
+</script></body></html>

@@ -1,0 +1,3 @@
+# Preserve source bytes so CONTENTS.sha256 also verifies on Windows and Linux.
+# This disables newline conversion; text files remain diffable.
+* -text

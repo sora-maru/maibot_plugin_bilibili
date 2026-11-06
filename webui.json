@@ -1,0 +1,157 @@
+{
+  "schema_version": 2,
+  "required_capabilities": [
+    "custom_pages",
+    "image_upload"
+  ],
+  "workspace_title": "Bilibili",
+  "pages": [
+    {
+      "id": "subscriptions",
+      "title": "Bilibili 订阅管理",
+      "placement": "sidebar",
+      "icon": "list",
+      "mode": "custom",
+      "entry": "webui/index.html",
+      "layout": "document",
+      "queries": {
+        "state": {
+          "api": "page_state"
+        },
+        "up": {
+          "api": "page_up_info",
+          "parameters": {
+            "uid": {
+              "type": "string",
+              "required": true
+            }
+          }
+        }
+      },
+      "actions": {
+        "save": {
+          "api": "page_save",
+          "parameters": {
+            "stream_id": {
+              "type": "string",
+              "required": true
+            },
+            "uid": {
+              "type": "string",
+              "required": true
+            },
+            "options": {
+              "type": "string",
+              "required": false,
+              "max_length": 2000
+            },
+            "at_users": {
+              "type": "string",
+              "required": false,
+              "max_length": 2000
+            }
+          }
+        },
+        "delete": {
+          "api": "page_delete",
+          "parameters": {
+            "stream_id": {
+              "type": "string",
+              "required": true
+            },
+            "uid": {
+              "type": "string",
+              "required": true
+            }
+          },
+          "confirmation": "确认删除这条订阅？"
+        },
+        "delete_session": {
+          "api": "page_delete_session",
+          "parameters": {
+            "stream_id": {
+              "type": "string",
+              "required": true
+            }
+          },
+          "confirmation": "确认删除该聊天的全部订阅？"
+        },
+        "ack": {
+          "api": "page_pending",
+          "parameters": {
+            "stream_id": {
+              "type": "string",
+              "required": true
+            },
+            "uid": {
+              "type": "string",
+              "required": true
+            },
+            "resolution": {
+              "type": "string",
+              "required": true,
+              "choices": [
+                "ack"
+              ]
+            }
+          },
+          "confirmation": "确认已在QQ收到该推送？将推进状态并继续监听。"
+        },
+        "retry": {
+          "api": "page_pending",
+          "parameters": {
+            "stream_id": {
+              "type": "string",
+              "required": true
+            },
+            "uid": {
+              "type": "string",
+              "required": true
+            },
+            "resolution": {
+              "type": "string",
+              "required": true,
+              "choices": [
+                "retry"
+              ]
+            }
+          },
+          "confirmation": "确认QQ未收到该推送？下一轮将允许重试，可能重复发送。"
+        },
+        "style": {
+          "api": "page_style",
+          "parameters": {
+            "style": {
+              "type": "string",
+              "required": true,
+              "choices": [
+                "template_1",
+                "template_2",
+                "simple"
+              ]
+            }
+          }
+        },
+        "logo": {
+          "api": "page_logo_upload",
+          "parameters": {
+            "upload_id": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "resetlogo": {
+          "api": "page_logo_reset",
+          "confirmation": "确认恢复默认卡片头像？"
+        }
+      },
+      "uploads": {
+        "logo": {
+          "action": "logo",
+          "image_max_edge": 2048
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+# Instance configuration, account credentials and subscription state
+config.toml
+subscriptions.json
+custom_logo.png
+data/
+runtime/
+temp/
+.env
+.env.*
+
+# Python and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+build/
+dist/

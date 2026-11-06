@@ -1,0 +1,37 @@
+# SDK 会生成 config.toml；此文件只是示例，不会被插件自动读取。
+[plugin]
+enabled = true
+config_version = "1.0.0"
+
+[access]
+admin_users = [] # 管理员 QQ 号字符串列表
+group_admin_can_manage = true
+allow_member_subscribe = false
+
+[bili]
+sessdata = ""
+proxy = ""
+bangumi_token = ""
+
+[push]
+interval_secs = 300
+task_gap_secs = 20
+dynamic_limit = 5
+recent_dynamic_cache = 64
+render_as_image = true
+renderer_template = "template_2"
+forward = false
+plain_push_template = ""
+plain_push_forward_template = ""
+reconnect_silent = false
+
+[parse]
+enable_parse_BV = true
+enable_parse_miniapp = true
+cooldown_secs = 60
+
+[ai]
+enable_summary = false
+model = "" # 留空使用 utils 辅助任务；填 replyer 使用回复任务；也可填已配置的模型 name
+include_images = false
+summary_prompt = ""
