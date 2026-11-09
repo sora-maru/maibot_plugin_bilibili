@@ -2,7 +2,9 @@
 
 从 [Soulter/astrbot_plugin_bilibili](https://github.com/Soulter/astrbot_plugin_bilibili) 移植的独立 MaiBot 插件。保留上游 B站客户端、动态过滤、凭据维护、番剧查询逻辑和三套 HTML 卡片模板，重新实现宿主接口、推送状态、命令、管理页及消息解析。
 
-本版插件 ID：`github.sora-maru.bilibili`，版本：`1.0.2`。
+本版插件 ID：`github.sora-maru.bilibili`，版本：`1.0.3`。
+
+1.0.3 根据维护者向上游作者取得的许可证确认，补齐 GNU AGPL v3 许可证全文，清单及项目元数据统一声明为 `AGPL-3.0-only`；本次不修改插件功能。
 
 1.0.2 更换插件 ID，并补齐卡片样式、文字模板及摘要模型的中文填写说明。文字模板和摘要提示词改为多行输入。改 ID 后的数据保留步骤见本文「数据与迁移」。
 
@@ -214,3 +216,11 @@ AI 摘要默认关闭。开启 `ai.enable_summary` 后，可设置 `ai.model` �
 ## 验证范围
 
 详见 `VALIDATION.md`。已通过本地 SDK 回归、目标宿主格式校验和浏览器预览。尚未连接用户的 MaiBot、QQ 或 B站账号进行实机联调。原来的 B站登录失效、风控412/-352、接口变动及受限内容访问条件仍然适用。
+
+## 许可证
+
+本项目按 **GNU Affero General Public License v3.0 only（AGPL-3.0-only）** 发布，完整文本见 [LICENSE](LICENSE)。
+
+2026-11-09，维护者 sora-maru 表示已向上游作者确认原插件采用 AGPL-3.0；本项目据此更新授权声明，未扩展为“或任何后续版本”。上游作者与贡献者署名、模板署名和第三方依赖的授权说明继续保留，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+分发本插件或修改版时，请遵守 AGPL v3 关于许可证、声明和对应源代码的要求；修改后通过网络向用户提供交互时，还需遵守第13条提供对应源代码的要求。

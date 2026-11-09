@@ -1,14 +1,14 @@
 {
   "manifest_version": 2,
   "id": "github.sora-maru.bilibili",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "name": "Bilibili 动态与直播订阅",
   "description": "移植自 Soulter 的 AstrBot Bilibili 插件，适配 MaiBot 与 SnowLuma",
   "author": {
     "name": "sora-maru（MaiBot移植）；Soulter 及原项目贡献者（上游）",
     "url": "https://github.com/sora-maru"
   },
-  "license": "LicenseRef-Upstream-Unspecified",
+  "license": "AGPL-3.0-only",
   "urls": {
     "repository": "https://github.com/sora-maru/maibot_plugin_bilibili",
     "homepage": "https://github.com/sora-maru/maibot_plugin_bilibili",
