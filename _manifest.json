@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "id": "github.sora-maru.bilibili",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "name": "Bilibili 动态与直播订阅",
   "description": "移植自 Soulter 的 AstrBot Bilibili 插件，适配 MaiBot 与 SnowLuma",
   "author": {
@@ -63,7 +63,7 @@
     {
       "type": "python_package",
       "name": "Pillow",
-      "version_spec": ">=11,<13"
+      "version_spec": ">=11"
     },
     {
       "type": "python_package",

@@ -2,7 +2,9 @@
 
 从 [Soulter/astrbot_plugin_bilibili](https://github.com/Soulter/astrbot_plugin_bilibili) 移植的独立 MaiBot 插件。保留上游 B站客户端、动态过滤、凭据维护、番剧查询逻辑和三套 HTML 卡片模板，重新实现宿主接口、推送状态、命令、管理页及消息解析。
 
-本版插件 ID：`github.sora-maru.bilibili`，版本：`1.0.3`。
+本版插件 ID：`github.sora-maru.bilibili`，版本：`1.0.4`。
+
+1.0.4 修复升级 MaiBot 后共享环境已安装 Pillow 13.0.0 时的依赖冲突。Pillow 依赖改为 `>=11`，保留宿主已经安装且符合要求的版本；已在 Pillow 13.0.0 下验证图片处理及插件回归测试。无需降级宿主的 Pillow。
 
 1.0.3 根据维护者向上游作者取得的许可证确认，补齐 GNU AGPL v3 许可证全文，清单及项目元数据统一声明为 `AGPL-3.0-only`；本次不修改插件功能。
 
@@ -29,6 +31,8 @@
 - MaiBot Plugin SDK **2.16.0 或更高的 2.x**。本地按 2.16.0 测试。
 - Python ≥3.11；本地验证使用 Python 3.13。其他宿主、SDK 和平台组合尚未联调。
 
+1.0.4 已在独立测试环境验证 Pillow **13.0.0**。上面的宿主和适配器版本是最初的适配基线，并不表示已经实机验证用户升级后的全部宿主功能。
+
 只需要连接器现有的 QQ 连接，不需要在本插件再次填写 SnowLuma 端口或 Token。
 
 ## 安装与首次使用
@@ -44,6 +48,20 @@
 7. 可先用 `/bili_sub_test 123456` 检查取数和消息渲染。测试不会改变订阅游标，也不会触发 @。
 
 首次订阅会记住已有动态，从后续更新开始推送。如果首次 B站请求失败，首次恢复查询时建立基线，不补发旧动态。直播提醒在轮询检测到状态变化时发送，不是实时 WebSocket 直播监听。
+
+### 升级后提示 Pillow 共享环境冲突
+
+如果启动提示“插件要求 `Pillow>=11,<13`，当前安装 `13.0.0`”，请升级本插件至 **1.0.4 或以上版本**。这是旧版插件的版本上限声明与宿主共享环境冲突，不需要降级 MaiBot 已安装的 Pillow，也不需要改订阅或登录凭据。
+
+手动更新时，先停止 MaiBot，使用新版插件文件覆盖原安装目录，保留 `config.toml`、备份目录及实例的 `data/plugins/github.sora-maru.bilibili/`，再重新启动。应使用插件市场或 GitHub 的新版本，旧的 1.0.3 Release 源码不会随 main 分支更新而改变。
+
+如需立即修改已安装的旧版，请将该插件目录内三处 Pillow 声明统一改为 `>=11`：
+
+- `_manifest.json`：`name` 为 `Pillow` 的依赖项，将 `version_spec` 改为 `">=11"`。
+- `requirements.txt`：将 `Pillow>=11,<13` 改为 `Pillow>=11`。
+- `pyproject.toml`：将 `dependencies` 中的 `Pillow>=11,<13` 改为 `Pillow>=11`。
+
+保存后重新启动。共享依赖准备会检查 `_manifest.json`，因此只改 `requirements.txt` 不能解决这个启动报错。
 
 ## 已移植功能
 
