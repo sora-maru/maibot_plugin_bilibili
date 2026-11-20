@@ -1,5 +1,5 @@
 # Pillow 13 compatibility verification environment; install using requirements.txt.
-maibot-plugin-sdk==2.16.0
+maibot-plugin-sdk==2.23.0
 Pillow==13.0.0
 bilibili-api-python==17.4.2
 curl_cffi==0.17.0

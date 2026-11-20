@@ -2,7 +2,9 @@
 
 从 [Soulter/astrbot_plugin_bilibili](https://github.com/Soulter/astrbot_plugin_bilibili) 移植的独立 MaiBot 插件。保留上游 B站客户端、动态过滤、凭据维护、番剧查询逻辑和三套 HTML 卡片模板，重新实现宿主接口、推送状态、命令、管理页及消息解析。
 
-本版插件 ID：`github.sora-maru.bilibili`，版本：`1.0.4`。
+本版插件 ID：`github.sora-maru.bilibili`，版本：`1.1.0`。
+
+1.1.0 适配 MaiBot 1.4.4–1.4.x、Plugin SDK 2.23.0 和 SnowLuma 适配器 1.3.1。已按 MaiBot 1.4.7 做源码级兼容验证。
 
 1.0.4 修复升级 MaiBot 后共享环境已安装 Pillow 13.0.0 时的依赖冲突。Pillow 依赖改为 `>=11`，保留宿主已经安装且符合要求的版本；已在 Pillow 13.0.0 下验证图片处理及插件回归测试。无需降级宿主的 Pillow。
 
@@ -25,13 +27,13 @@
 
 ## 目标环境
 
-- MaiBot **1.3.16**。
-- `maibot-team.snowluma-adapter` **1.1.9**。
+- MaiBot **1.4.4–1.4.x**（本地按 **1.4.7** 校验）。
+- `maibot-team.snowluma-adapter` **1.3.1 或更新版**。适配器 1.3.1 要求 MaiBot ≥1.4.4，升级 MaiBot 时也请升级适配器。
 - SnowLuma **2.4.0**（用户提供的 2.4 系列版本）。
-- MaiBot Plugin SDK **2.16.0 或更高的 2.x**。本地按 2.16.0 测试。
-- Python ≥3.11；本地验证使用 Python 3.13。其他宿主、SDK 和平台组合尚未联调。
+- MaiBot Plugin SDK **2.23.0 或更高的 2.x**。本地按 2.23.0 测试。
+- Python ≥3.12；本地验证使用 Python 3.13。其他宿主、SDK 和平台组合尚未联调。
 
-1.0.4 已在独立测试环境验证 Pillow **13.0.0**。上面的宿主和适配器版本是最初的适配基线，并不表示已经实机验证用户升级后的全部宿主功能。
+1.1.0 已在 MaiBot 1.4.7 / SDK 2.23.0 / Pillow 13.0.0 的独立测试环境中验证。尚未连接你升级后的实际 MaiBot 和 QQ 账号做实机联调。
 
 只需要连接器现有的 QQ 连接，不需要在本插件再次填写 SnowLuma 端口或 Token。
 
@@ -40,12 +42,13 @@
 可以在 MaiBot 插件管理中使用本仓库地址安装：`https://github.com/sora-maru/maibot_plugin_bilibili`。手动安装时，也可以从 GitHub 下载源码 ZIP，解压后将包含 `plugin.py` 的目录命名为 `maibot_plugin_bilibili` 并放入 `plugins/`，不要把外层解压目录一起套进去。
 
 1. 将安装包解压，把整个 `maibot_plugin_bilibili` 文件夹放进 MaiBot 实例的 `plugins/`。确保入口为 `plugins/maibot_plugin_bilibili/plugin.py`，不要多套一层目录。
-2. 在 MaiBot 中重载插件或重启，确认插件正常加载。依赖列在 `_manifest.json` 和 `requirements.txt`；如宿主提示缺包，使用 **运行 MaiBot 的同一个 Python 环境**执行 `python -m pip install -r plugins/maibot_plugin_bilibili/requirements.txt`。使用 uv 管理实例时可执行对应的 `uv pip install -r ...`。
-3. 打开本插件配置，将 `access.admin_users` 设置为管理员 QQ 号列表。QQ 号作为字符串填写，例如 TOML 的 `admin_users = ["123456789"]`。SDK 会生成实际配置；`config.example.toml` 仅供参考。
-4. 管理员**私聊**机器人发送 `/bili_login`，用 Bilibili App 扫码。也可在插件配置 `bili.sessdata` 中填写凭据。扫码凭据优先，单独保存在插件标准数据目录，管理页不会返回凭据内容。
-5. 让机器人先收到目标群或好友的一条消息。在该聊天中发送 `/bili_sid` 可查看真实聊天流 ID。
-6. 在群聊发送 `/bili_sub 123456`，或打开 WebUI「插件扩展 → Bilibili 订阅管理」，选择聊天并填写 B站 UID 后保存。
-7. 可先用 `/bili_sub_test 123456` 检查取数和消息渲染。测试不会改变订阅游标，也不会触发 @。
+2. 确认 MaiBot 至少 1.4.4，SnowLuma 适配器至少 1.3.1。1.3.1 适配器更新涉及旧连接配置迁移；升级前先备份适配器配置，并按适配器说明检查配置保留情况。
+3. 在 MaiBot 中重载插件或重启，确认插件正常加载。依赖列在 `_manifest.json` 和 `requirements.txt`；如宿主提示缺包，使用 **运行 MaiBot 的同一个 Python 环境**执行 `python -m pip install -r plugins/maibot_plugin_bilibili/requirements.txt`。使用 uv 管理实例时可执行对应的 `uv pip install -r ...`。
+4. 打开本插件配置，将 `access.admin_users` 设置为管理员 QQ 号列表。QQ 号作为字符串填写，例如 TOML 的 `admin_users = ["123456789"]`。SDK 会生成实际配置；`config.example.toml` 仅供参考。
+5. 管理员**私聊**机器人发送 `/bili_login`，用 Bilibili App 扫码。也可在插件配置 `bili.sessdata` 中填写凭据。扫码凭据优先，单独保存在插件标准数据目录，管理页不会返回凭据内容。
+6. 让机器人先收到目标群或好友的一条消息。在该聊天中发送 `/bili_sid` 可查看真实聊天流 ID。
+7. 在群聊发送 `/bili_sub 123456`，或打开 WebUI「插件扩展 → Bilibili 订阅管理」，选择聊天并填写 B站 UID 后保存。
+8. 可先用 `/bili_sub_test 123456` 检查取数和消息渲染。测试不会改变订阅游标，也不会触发 @。
 
 首次订阅会记住已有动态，从后续更新开始推送。如果首次 B站请求失败，首次恢复查询时建立基线，不补发旧动态。直播提醒在轮询检测到状态变化时发送，不是实时 WebSocket 直播监听。
 
@@ -177,7 +180,7 @@ AI 摘要默认关闭。开启 `ai.enable_summary` 后，可设置 `ai.model` �
 
 ### 摘要模型如何填写
 
-本版复用 MaiBot 已配置的模型。对于 **MaiBot 1.3.16**，插件 LLM 接口的默认任务是 **`utils`**，不一定等于平时聊天使用的模型：
+本版复用 MaiBot 已配置的模型。对于 **MaiBot 1.4.7**，插件 LLM 接口留空模型名时仍使用默认辅助任务 **`utils`**，不一定等于平时聊天使用的模型：
 
 | 字段内容 | 使用的模型配置 |
 | --- | --- |
@@ -210,7 +213,7 @@ AI 摘要默认关闭。开启 `ai.enable_summary` 后，可设置 `ai.model` �
 
 ## 投递确认与重连
 
-适配器1.1.9会验证 SnowLuma 群消息回执。有时客户端已接受动作，但宿主没取得投递确认；此时消息仍可能稍后到达。
+适配器1.3.1会验证 SnowLuma 群消息回执。有时客户端已接受动作，但宿主没取得投递确认；此时消息仍可能稍后到达。
 
 本插件在发送前持久保存待确认记录，确认成功后才推进动态或直播状态。未确认时暂停该聊天、该 UP 主的后续推送，**不会自动重复发送**。请查看 QQ 后，在管理页或 `/bili_pending` 选择已收到或允许重试。发送过程中进程退出，也会保留待确认记录。多步骤消息、提醒或文件上传可能部分完成，选择重试前需要检查已发送内容。
 
@@ -220,7 +223,7 @@ AI 摘要默认关闭。开启 `ai.enable_summary` 后，可设置 `ai.model` �
 
 订阅、运行状态与扫码凭据位于 SDK 分配的 **`ctx.paths.data_dir/subscriptions.json`**。头像为该目录的 `custom_logo.png`。卡片临时文件位于 `runtime_dir/cards`，正常发送后清理。插件卸载会取消轮询、凭据维护和登录任务。
 
-**从1.0.0／1.0.1升级到1.0.2：插件ID已改变。** MaiBot 1.3.16 按插件ID分配数据目录，新目录为实例根目录下的 `data/plugins/github.sora-maru.bilibili/`，原目录为 `data/plugins/veeotech.bilibili/`。如已订阅或扫码登录：
+**从1.0.0／1.0.1升级到1.0.2：插件ID已改变。** MaiBot 按插件ID分配数据目录，新目录为实例根目录下的 `data/plugins/github.sora-maru.bilibili/`，原目录为 `data/plugins/veeotech.bilibili/`。如已订阅或扫码登录：
 
 1. 先停止 MaiBot 并备份原插件目录与数据目录。
 2. 使用同一个 `plugins/maibot_plugin_bilibili/` 目录覆盖升级，保留其中现有的 `config.toml`；不要同时安装旧ID和新ID两份插件。
@@ -228,6 +231,8 @@ AI 摘要默认关闭。开启 `ai.enable_summary` 后，可设置 `ai.model` �
 4. 重启 MaiBot，在新ID的插件页面检查订阅和登录状态。无需迁移 `temp/plugins/` 下的临时卡片。
 
 没有旧数据时直接安装即可。插件不会自行读取其他ID的数据目录。后续更新使用本移植版仓库或相应安装包，不要使用 AstrBot 上游仓库覆盖本插件。
+
+**从1.0.x升级到1.1.0：** 插件 ID 和订阅数据格式未改变，保留现有 `config.toml` 及 `data/plugins/github.sora-maru.bilibili/` 即可。MaiBot 1.4.x 还要求适配器至少 1.3.1，请一并升级；首次升级适配器前请备份连接配置，并查看其迁移说明。
 
 本版不自动导入 AstrBot 的旧订阅。若有旧数据，需要先把 UMO 映射为 MaiBot 的实际聊天流 ID；也可通过网页重新添加。不要直接覆盖本插件的数据文件。
 

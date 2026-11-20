@@ -1,15 +1,26 @@
 # 移植版验证记录
 
+## 1.1.0：MaiBot 1.4.7 适配验证（2026-11-20）
+
+- 最新正式 Release 核查：MaiBot v1.4.7（2026-11-18）、Plugin SDK v2.23.0（2026-11-14）、SnowLuma 适配器 v1.3.1（2026-11-10）。
+- 参考源码：MaiBot `b7f36825463413c47e61d44fe8a93427f6fe5a6f`；SDK `f9984673d7e6061832e9306cf0e0daaf375f0f91`；适配器 `2583f411c33b1e58a5e7d837a95fa283072e5842`。
+- 适配器1.3.1最低支持 MaiBot 1.4.4；仍提供本插件调用的群成员查询、@全体余量和 SnowLuma action API。本插件据此提高适配器依赖下限。
+- manifest 兼容范围更新至宿主1.4.4–1.4.99、SDK 2.23.0–2.x；Python最低版本与 MaiBot 1.4.7 对齐为3.12。
+- 在 MaiBot 1.4.7 原始 Manifest Pydantic 模型、WebUI loader 和 SDK 2.23.0 下验证插件配置及组件注册；Pillow 13.0.0 环境的51项图片与插件测试全部通过。
+- 尚未连接用户实际 MaiBot 1.4.7、SnowLuma 和 QQ 账号做实机联调。
+
 ## 1.0.4：Pillow 13 兼容修复（2026-11-16）
 
 - 修复触发条件：升级 MaiBot 后共享环境安装 Pillow 13.0.0，旧插件在依赖准备阶段因 `Pillow>=11,<13` 被拒绝加载。
 - `_manifest.json`、`requirements.txt` 和 `pyproject.toml` 统一使用 `Pillow>=11`。宿主已有的13.0.0满足新声明，无需降级或替换共享环境。
-- 在独立虚拟环境实际安装 **Pillow 13.0.0**，配合 SDK 2.16.0 / Python 3.13 执行 **51项测试，全部通过**：原有42项回归测试，加上9项图片兼容用例。
+- 在独立虚拟环境实际安装 **Pillow 13.0.0**，配合 SDK 2.23.0 / Python 3.13 执行 **51项测试，全部通过**：原有42项回归测试，加上9项图片兼容用例。
 - 图片兼容用例覆盖 RGB、RGBA、调色板、16位PNG头像缩放和转换、JPEG EXIF方向、WebP、二维码PNG、超长图判断及损坏图片拒绝。
 - `pip check` 通过，三个依赖声明一致性及Pillow 11/12/13版本接受性检查通过。目标宿主Manifest / WebUI校验与安装包逐文件哈希检查通过。
 - 没有更改共享环境、用户运行配置、订阅或登录数据。尚未进入用户升级后的实际MaiBot实例运行；本次测试不代表新版宿主的全部功能均已验证。
 
 ## 既往版本验证记录
+
+以下条目记录对应旧插件版本时的历史检查结果，不代表旧 MaiBot 版本属于 1.1.0 的目标支持范围。
 
 2026-11-09 更新至1.0.3：依据维护者提供的上游AGPL-3.0确认，根目录新增完整LICENSE，插件清单及pyproject.toml统一声明AGPL-3.0-only。许可证全文取自 SPDX license-list-data 的 AGPL-3.0-only.txt，检查标准标题、版本日期和第13条内容。目标宿主Manifest与WebUI声明校验通过；本次仅更新授权和发布元数据，未改动功能代码，未重复执行行为测试。安装包逐文件SHA-256校验通过。
 
@@ -17,42 +28,43 @@
 
 2026-11-06 更新至 1.0.1：配置页6个分组、25个字段均提供中文显示名；通过 SDK 2.16.0 生成的实际配置 Schema 检查中文标签，确认配置键和默认值兼容。重新执行目标宿主 Manifest / WebUI 校验，并校验新版安装包内容与 SHA-256。
 
-2026-11-06 更新至 1.0.2：插件ID改为 `github.sora-maru.bilibili`，补充旧ID数据目录迁移说明。文字推送模板、转发原文模板及摘要提示词均改为多行输入，保留6个中文分组和25个中文字段。执行 MaiBot 1.3.16 原始模型路由函数，确认留空映射到 `utils`、`replyer` 映射到回复任务、已配置模型名映射到直选模型。重新执行42项回归测试、目标宿主清单与WebUI校验，均通过。三种卡片样式已生成独立预览图。
+2026-11-06 更新至 1.0.2：插件ID改为 `github.sora-maru.bilibili`，补充旧ID数据目录迁移说明。文字推送模板、转发原文模板及摘要提示词均改为多行输入，保留6个中文分组和25个中文字段。执行当时 MaiBot 1.3.16 模型路由函数，确认留空映射到 `utils`、`replyer` 映射到回复任务、已配置模型名映射到直选模型。重新执行42项回归测试、目标宿主清单与WebUI校验，均通过。三种卡片样式已生成独立预览图。
 
 ## 固定参考源码
 
 | 项目 | 版本 / 提交 |
 | --- | --- |
 | AstrBot Bilibili 插件 | metadata v1.7.2；`90c459fd3495b0926777e7ee0b26574d7748f0c5` |
-| MaiBot | v1.3.16；`fe88ec6b6053e40eaf430cb5ba7ed7e805add2cb` |
-| MaiBot Plugin SDK | v2.16.0；参考源码 `7cd4189cbd70b83c2e38eead38e937aaa5055958`，测试使用 PyPI 2.16.0 |
-| SnowLuma 适配器 | v1.1.9；`ab751ae5c11f501e0158e33cacc321b33e34ef0c` |
+| MaiBot latest target | v1.4.7；`b7f36825463413c47e61d44fe8a93427f6fe5a6f` |
+| MaiBot 1.3 reference | v1.3.16；`fe88ec6b6053e40eaf430cb5ba7ed7e805add2cb` |
+| MaiBot Plugin SDK | v2.23.0；`f9984673d7e6061832e9306cf0e0daaf375f0f91` |
+| SnowLuma 适配器 | v1.3.1；`2583f411c33b1e58a5e7d837a95fa283072e5842` |
 | SnowLuma | v2.4.0；`e44e4ced17c5911b9aa9db449ba29f2d9e567d2a` |
 
 ## 已执行验证
 
-- **42 项 pytest 测试通过**。使用真实 SDK `PluginContext` 发送能力请求，由模拟宿主返回目标版本形状的 RPC 响应，没有模拟或安装 AstrBot。
+- **51 项 pytest 测试通过**。使用 SDK 2.23.0 和 Pillow 13.0.0，通过真实 SDK `PluginContext` 发送能力请求，由模拟宿主返回目标版本形状的 RPC 响应，没有模拟或安装 AstrBot。
 - 覆盖插件组件收集、配置 Schema、订阅初始化、历史动态基线、持久化去重、失败后的基线恢复、不同聊天隔离和同 UID 请求共享。
 - 覆盖类型与正则过滤、视频标题过滤、普通成员管理权限、管理员私聊登录限制、个人 @ 不覆盖原过滤条件、网页完整替换和删除订阅状态。
 - 覆盖动态投递确认、未确认时不推进游标、不自动重试、ack/retry 后恢复、进程重启仍保留待确认状态、单轮数量限制。
 - 覆盖开播/下播、直播状态提交、下播不 @、下播过滤、合并转发之外的真实 @。
 - 覆盖扫码登录结果持久化和二维码清理、登出后恢复配置凭据、卡片PNG响应处理和临时图清理、头像上传、番剧及视频工具桥接、摘要发送。
-- 使用 MaiBot v1.3.16 **原始 Manifest Pydantic 模型**校验安装清单。为避免启动整套机器人，仅隔离掉宿主集成导入，执行原模型和校验器；结果通过。
-- 使用 MaiBot v1.3.16 **原始 `load_webui_extension`** 读取 `webui.json` 和 HTML 页面，结果通过；所有网页 query/action 对应的 Python API 均已注册。
+- 使用 MaiBot v1.4.7 **原始 Manifest Pydantic 模型**校验安装清单。为避免启动整套机器人，仅隔离掉宿主集成导入，执行原模型和校验器；结果通过。
+- 使用 MaiBot v1.4.7 **原始 `load_webui_extension`** 读取 `webui.json` 和 HTML 页面，结果通过；所有网页 query/action 对应的 Python API 均已注册。
 - Python 源码语法检查通过，确认无 `astrbot` 或 `src.*` 宿主内部模块依赖。
 - 本地浏览器检查管理页桌面布局、390px 手机宽度及编辑/保存参数；使用模拟 `maibot` 桥，不代表已连接真实 MaiBot WebUI。
 - 三套上游 HTML 卡片使用示例中文数据渲染并目视检查。按样式设置截图宽度，截图页面隐藏滚动条以防右边缘被挤压。此验证检查模板排版，不代表已启动用户的宿主渲染服务。
-- 检查 SnowLuma v2.4.0 文件上传实现及其 Base64 测试，确认无需共享本地文件路径；检查适配器1.1.9公开API和发送确认约定。
+- 检查 SnowLuma v2.4.0 文件上传实现及其 Base64 测试，确认无需共享本地文件路径；检查适配器1.3.1 API 别名和发送确认约定。
 
 ## 本地测试主要依赖
 
-Windows / Python 3.13；maibot-plugin-sdk 2.16.0；bilibili-api-python 17.4.2；curl_cffi 0.17.0；aiohttp 3.14.5；Jinja2 3.1.6；Pillow 12.3.0；qrcode 8.2；pydantic 2.14.3；pytest 9.2.0。
+Windows / Python 3.13；maibot-plugin-sdk 2.23.0；bilibili-api-python 17.4.2；curl_cffi 0.17.0；aiohttp 3.14.5；Jinja2 3.1.6；Pillow 13.0.0；qrcode 8.2；pydantic 2.14.3；pytest 9.2.0。
 
 安装时可按清单允许范围选择兼容版本，具体本地验证版本见随包 `requirements-tested.txt`。
 
 ## 尚未实机验证
 
-- 在用户实际 MaiBot 1.3.16 实例中加载、热重载和展示管理页。
+- 在用户实际 MaiBot 1.4.7 实例中加载、热重载和展示管理页。
 - 用户实际 QQ 群/私聊中的图片、合并转发、@全体、文件上传、回执与待确认恢复。
 - 使用真实 B站账号扫码、凭据自动刷新和实际动态/直播更新。
 - 用户配置模型的工具选择、视觉摘要和 MaiSaka 历史效果。
@@ -61,7 +73,7 @@ Windows / Python 3.13；maibot-plugin-sdk 2.16.0；bilibili-api-python 17.4.2；
 
 ## 重跑测试
 
-在与插件依赖兼容的 Python 环境中，安装 `maibot-plugin-sdk==2.16.0`、`requirements.txt` 以及 `pytest pytest-asyncio`，然后从插件目录执行：
+在与插件依赖兼容的 Python 环境中，安装 `maibot-plugin-sdk==2.23.0`、`requirements.txt` 以及 `pytest pytest-asyncio`，然后从插件目录执行：
 
 ```text
 python -m pytest tests -q
